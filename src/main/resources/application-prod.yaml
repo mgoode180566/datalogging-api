@@ -22,3 +22,8 @@ spring:
 
 server:
   port: 5000
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
