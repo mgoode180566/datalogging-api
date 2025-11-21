@@ -45,7 +45,7 @@ jobs:
           zip -r deploy.zip $jar_file
           
           # Upload application version to Elastic Beanstalk S3 bucket
-          aws s3 cp deploy.zip s3://datalogging-api/deploy.zip
+          aws s3 cp deploy.zip s3://s3-datalogging-api/deploy.zip
           
           # Create a new Elastic Beanstalk application version
           aws elasticbeanstalk create-application-version \
