@@ -14,16 +14,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # Step 2: Set up JDK (You can use Corretto or Temurin based on your preference)
+      # Step 2: Set up JDK
       - name: Set Up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'corretto'  # You chose 'corretto', so we keep this
+          distribution: 'corretto'
           java-version: '21'
 
       # Step 3: Build with Maven
       - name: Build with Maven
-        run: mvn clean package -DskipTests  # Skipping tests for faster build (optional)
+        run: mvn clean package -DskipTests
 
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
@@ -32,31 +32,36 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Deploy to AWS Elastic Beanstalk
+      - name: Prepare deployment package
         run: |
-          # Find and move the application JAR file
           jar_file=$(ls target/*.jar | head -n 1)
           echo "Found JAR file: $jar_file"
-          
-          # Ensure the JAR is at the root level
+
+          # Copy JAR to root as application.jar
           cp "$jar_file" application.jar
-          
-          # Zip the application JAR file
-          zip -r deploy.zip $jar_file
-          
-          # Upload application version to Elastic Beanstalk S3 bucket
-          aws s3 cp deploy.zip s3://s3-datalogging-api/deploy.zip
-          
-          # Create a new Elastic Beanstalk application version
+
+          # Zip ONLY application.jar
+          zip -j deploy.zip application.jar
+
+          echo "Created deploy.zip with contents:"
+          unzip -l deploy.zip
+
+      - name: Deploy to Elastic Beanstalk
+        run: |
+          VERSION="build-${{ github.run_id }}"
+          echo "Using version label: $VERSION"
+
+          # Upload ZIP to S3
+          aws s3 cp deploy.zip s3://s3-datalogging-api/$VERSION.zip
+
+          # Create EB application version
           aws elasticbeanstalk create-application-version \
-          --application-name datalogging-api \
-          --version-label v${{ github.run_number }} \
-          --source-bundle S3Bucket="s3-datalogging-api",S3Key="deploy.zip" \
-          --region us-east-1
-          
-          # Update the environment to use the newly created version
+            --application-name datalogging-api \
+            --version-label "$VERSION" \
+            --source-bundle S3Bucket="s3-datalogging-api",S3Key="$VERSION.zip"
+
+          # Deploy that version
           aws elasticbeanstalk update-environment \
-          --application-name datalogging-api \
-          --environment-name Datalogging-api-env \
-          --version-label v${{ github.run_number }} \
-          --region us-east-1
+            --application-name datalogging-api \
+            --environment-name Datalogging-api-env \
+            --version-label "$VERSION"
