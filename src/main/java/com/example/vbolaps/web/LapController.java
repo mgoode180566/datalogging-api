@@ -21,6 +21,11 @@ public class LapController {
         this.sampleRepo = sampleRepo;
     }
     
+    @GetMapping("/home")
+    public String home() {
+        return "Home";
+    }
+    
     @GetMapping("/sessions/{sessionId}/laps")
     public List<Map<String, Object>> listLaps(@PathVariable("sessionId") Long sessionId) {
         return lapRepo.findBySessionIdOrderByNumber(sessionId).stream()
