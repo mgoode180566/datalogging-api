@@ -42,7 +42,7 @@ jobs:
           cp "$jar_file" application.jar
           
           # Zip the application JAR file
-          zip -r deploy.zip application.jar
+          zip -r deploy.zip $jar_file
           
           # Upload application version to Elastic Beanstalk S3 bucket
           aws s3 cp deploy.zip s3://datalogging-api/deploy.zip
