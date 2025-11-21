@@ -1,0 +1,26 @@
+spring:
+  profiles:
+    active: prod
+  datasource:
+    url: jdbc:postgresql://datalogging.chc40a682r3a.us-east-1.rds.amazonaws.com:5432/datalogging?sslmode=require
+    username: sa
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update   # or validate for production
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  datasource.hikari:
+    maximum-pool-size: 10
+    minimum-idle: 2
+    connection-timeout: 30000
+    idle-timeout: 600000
+    max-lifetime: 1800000
+
+server:
+  port: 8080
