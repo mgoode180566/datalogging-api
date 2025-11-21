@@ -34,7 +34,7 @@ jobs:
 
       - name: Prepare deployment package
         run: |
-          jar_file=$(ls target/*.jar | head -n 1)
+          jar_file=$(ls target/*SNAPSHOT.jar | head -n 1)
           echo "Found JAR file: $jar_file"
 
           # Copy JAR to root as application.jar
