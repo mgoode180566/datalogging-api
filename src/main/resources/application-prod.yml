@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://datalogging.chc40a682r3a.us-east-1.rds.amazonaws.com:5432/datalogging?sslmode=require
-    username: sa
-    password: password
+    username: postgres
+    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
