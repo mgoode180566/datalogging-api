@@ -25,6 +25,7 @@ jobs:
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
+      # Step 4: Configure AWS CLI
       - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -32,20 +33,40 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      # Step 5: Prepare ZIP package for Elastic Beanstalk
       - name: Prepare deployment package
         run: |
+          echo "Preparing deployment package..."
+
           jar_file=$(ls target/*SNAPSHOT.jar | head -n 1)
           echo "Found JAR file: $jar_file"
 
-          # Copy JAR to root as application.jar
-          cp "$jar_file" application.jar
+          # Create deploy directory
+          mkdir deploy
 
-          # Zip ONLY application.jar
-          zip -j deploy.zip application.jar
+          # Copy JAR
+          cp "$jar_file" deploy/application.jar
 
-          echo "Created deploy.zip with contents:"
-          unzip -l deploy.zip
+          # Copy Procfile if exists
+          if [ -f "Procfile" ]; then
+            cp Procfile deploy/Procfile
+          fi
 
+          # Copy .platform folder (important!)
+          if [ -d ".platform" ]; then
+            cp -r .platform deploy/.platform
+          else
+            echo "WARNING: .platform folder not found!"
+          fi
+
+          # Create ZIP file
+          cd deploy
+          zip -r ../deploy.zip .
+
+          echo "Deployment ZIP created:"
+          unzip -l ../deploy.zip
+
+      # Step 6: Deploy to Elastic Beanstalk
       - name: Deploy to Elastic Beanstalk
         run: |
           VERSION="build-${{ github.run_id }}"
@@ -60,7 +81,7 @@ jobs:
             --version-label "$VERSION" \
             --source-bundle S3Bucket="s3-datalogging-api",S3Key="$VERSION.zip"
 
-          # Deploy that version
+          # Deploy version to environment
           aws elasticbeanstalk update-environment \
             --application-name datalogging-api \
             --environment-name Datalogging-api-env \
