@@ -18,7 +18,6 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
-
 app:
   import:
     # Optional default file path to auto-import on startup
