@@ -14,10 +14,9 @@ public class CorsConfig {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/api/**")
-					.allowedOrigins(
-						"https://master.d2xn66setsnq9o.amplifyapp.com",
-						"https://api.datalogging.click"
-					)
+					.allowedOrigins("https://master.d2xn66setsnq9o.amplifyapp.com",
+						"https://datalogging.click",
+						"https://www.datalogging.click")
 					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 					.allowedHeaders("*")
 					.allowCredentials(true);
