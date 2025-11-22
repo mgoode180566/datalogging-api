@@ -81,6 +81,7 @@ jobs:
             --version-label "$VERSION" \
             --source-bundle S3Bucket="s3-datalogging-api",S3Key="$VERSION.zip"
 
+
           # Deploy version to environment
           aws elasticbeanstalk update-environment \
             --application-name datalogging-api \
