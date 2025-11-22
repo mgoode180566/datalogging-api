@@ -20,10 +20,12 @@ spring:
     idle-timeout: 600000
     max-lifetime: 1800000
 
-server:
-  port: 5000
+
 
   servlet:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+
+server:
+  port: 5000
