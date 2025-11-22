@@ -19,9 +19,6 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
-server:
-  port: 5000
-
 app:
   import:
     # Optional default file path to auto-import on startup
