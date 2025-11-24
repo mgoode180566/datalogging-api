@@ -1,9 +1,9 @@
 package com.example.vbolaps.web;
 
-import com.example.vbolaps.model.Lap;
-import com.example.vbolaps.model.Sample;
+import com.example.vbolaps.model.*;
 import com.example.vbolaps.repo.LapRepo;
 import com.example.vbolaps.repo.SampleRepo;
+import com.example.vbolaps.repo.SessionRepo;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -15,15 +15,18 @@ public class LapController {
 
     private final LapRepo lapRepo;
     private final SampleRepo sampleRepo;
+    private final SessionRepo sessionRepo;
 
-    public LapController(LapRepo lapRepo, SampleRepo sampleRepo) {
+    public LapController(SessionRepo sessionRepo, LapRepo lapRepo, SampleRepo sampleRepo) {
+        this.sessionRepo = sessionRepo;
         this.lapRepo = lapRepo;
         this.sampleRepo = sampleRepo;
     }
     
-    @GetMapping("/home")
-    public String home() {
-        return "Home";
+    @GetMapping("/sessions")
+    public List<SessionDto> getSessions() {
+        List<Session> sessions = sessionRepo.findAll();
+        return sessions.stream().map(s -> SessionMapper.toDto(s)).collect(Collectors.toList());
     }
     
     @GetMapping("/sessions/{sessionId}/laps")

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class Session {
     private String driver;
     private String vehicle;
     private String weather;
+    private LocalDate date;
     private Instant createdAt = Instant.now();
 
     @JsonManagedReference

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,15 +29,16 @@ public class ImportService {
     }
     
     @Transactional
-    public Session importVbo(InputStream vboStream) throws Exception {
+    public Session importVbo(InputStream vboStream, SessionDto sessionDto) throws Exception {
         VboParser parser = new VboParser();
         VboParser.Parsed parsed = parser.parse(vboStream);
 
         Session session = new Session();
-        session.setCircuit(parsed.sessionMeta.getOrDefault("circuit", parsed.sessionMeta.getOrDefault("name", "Unknown")));
-        session.setDriver(parsed.sessionMeta.getOrDefault("driver", ""));
-        session.setVehicle(parsed.sessionMeta.getOrDefault("vehicle", ""));
-        session.setWeather(parsed.sessionMeta.getOrDefault("weather", ""));
+        session.setCircuit(sessionDto.circuit());
+        session.setDriver(sessionDto.driver());
+        session.setVehicle(sessionDto.vehicle());
+        //session.setWeather(parsed.sessionMeta.getOrDefault("weather", ""));
+        session.setDate(sessionDto.date());
 
         // Flatten rows to maps
         List<Map<String, Double>> rows = parsed.rows.stream().map(r -> r.values).collect(Collectors.toList());

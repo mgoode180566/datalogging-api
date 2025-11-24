@@ -16,8 +16,7 @@ public class CorsConfig {
 				registry.addMapping("/api/**")
 					.allowedOrigins("https://master.d2xn66setsnq9o.amplifyapp.com",
 						"https://datalogging.click",
-						"https://www.datalogging.click",
-						"http://localhost:4173")
+						"https://www.datalogging.click")
 					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 					.allowedHeaders("*")
 					.allowCredentials(true);
