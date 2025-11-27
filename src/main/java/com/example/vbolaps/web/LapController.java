@@ -26,6 +26,7 @@ public class LapController {
     @GetMapping("/sessions")
     public List<SessionDto> getSessions() {
         List<Session> sessions = sessionRepo.findAll();
+        List<SessionDto> dtos = sessions.stream().map(s -> SessionMapper.toDto(s)).collect(Collectors.toList());
         return sessions.stream().map(s -> SessionMapper.toDto(s)).collect(Collectors.toList());
     }
     
