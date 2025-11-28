@@ -36,7 +36,8 @@ public class LapController {
           .map(l -> Map.<String, Object>of(
             "id", l.getId(),
             "number", l.getNumber(),
-            "lapTimeSeconds", l.getLapTimeSeconds()
+            "lapTimeSeconds", l.getLapTimeSeconds(),
+            "samples", l.getSamples().stream().map(s -> SampleMapper.toDto(s)).collect(Collectors.toList())
           ))
           .collect(Collectors.toList());
     }
