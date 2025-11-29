@@ -14,7 +14,7 @@ public class Sample {
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     private Lap lap;
-
+    
     private int seq;           // sequential index in lap
     private double time;       // vbo 'time' if present
     private double lat;

@@ -31,15 +31,15 @@ public class LapController {
     }
     
     @GetMapping("/sessions/{sessionId}/laps")
-    public List<Map<String, Object>> listLaps(@PathVariable("sessionId") Long sessionId) {
-        return lapRepo.findBySessionIdOrderByNumber(sessionId).stream()
-          .map(l -> Map.<String, Object>of(
-            "id", l.getId(),
-            "number", l.getNumber(),
-            "lapTimeSeconds", l.getLapTimeSeconds(),
-            "samples", l.getSamples().stream().map(s -> SampleMapper.toDto(s)).collect(Collectors.toList())
-          ))
-          .collect(Collectors.toList());
+    public List<LapDto> listLaps(@PathVariable("sessionId") Long sessionId) {
+        return lapRepo.findBySessionIdOrderByNumber(sessionId).stream().map(LapMapper::toDto).toList();
+//          .map(l -> Map.<String, Object>of(
+//            "id", l.getId(),
+//            "number", l.getNumber(),
+//            "lapTimeSeconds", l.getLapTimeSeconds(),
+//            "samples", l.getSamples().stream().map(s -> SampleMapper.toDto(s)).collect(Collectors.toList())
+//          ))
+//          .collect(Collectors.toList());
     }
     
     @GetMapping("/laps/{lapId}/polyline")
