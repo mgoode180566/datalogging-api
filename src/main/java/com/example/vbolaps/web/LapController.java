@@ -4,11 +4,13 @@ import com.example.vbolaps.model.*;
 import com.example.vbolaps.repo.LapRepo;
 import com.example.vbolaps.repo.SampleRepo;
 import com.example.vbolaps.repo.SessionRepo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequestMapping("/api")
 public class LapController {
@@ -30,16 +32,19 @@ public class LapController {
         return sessions.stream().map(s -> SessionMapper.toDto(s)).collect(Collectors.toList());
     }
     
+    @GetMapping("/sessions/{sessionId}")
+    public SessionDto getSession(@PathVariable("sessionId") Long sessionId) {
+        Session session = sessionRepo.getReferenceById(sessionId);
+        log.info(session.toString());
+        return SessionMapper.toDto(session);
+    }
+    
     @GetMapping("/sessions/{sessionId}/laps")
     public List<LapDto> listLaps(@PathVariable("sessionId") Long sessionId) {
-        return lapRepo.findBySessionIdOrderByNumber(sessionId).stream().map(LapMapper::toDto).toList();
-//          .map(l -> Map.<String, Object>of(
-//            "id", l.getId(),
-//            "number", l.getNumber(),
-//            "lapTimeSeconds", l.getLapTimeSeconds(),
-//            "samples", l.getSamples().stream().map(s -> SampleMapper.toDto(s)).collect(Collectors.toList())
-//          ))
-//          .collect(Collectors.toList());
+        return lapRepo.findBySessionIdOrderByNumber(sessionId)
+          .stream()
+          .map(LapMapper::toDto)
+          .toList();
     }
     
     @GetMapping("/laps/{lapId}/polyline")
