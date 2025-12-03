@@ -78,7 +78,7 @@ public class ImportService {
             lap.setSession(session);
             lap.setNumber(lapNo);
             
-            log.debug("Lap : ", lap.getNumber());
+            log.info("Lap : {}", lap.getNumber());
             
             // naive lap time from first/last 'time' column if present
             double t0 = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("time", Double.NaN);
@@ -121,6 +121,7 @@ public class ImportService {
             }
             lapRepo.save(lap);
         }
+        log.info("Session contains {} laps", session.getLaps().size());
         session = sessionRepo.save(session);
         return session;
     }
