@@ -81,8 +81,8 @@ public class ImportService {
             log.info("Lap : {}", lap.getNumber());
             
             // naive lap time from first/last 'time' column if present
-            double t0 = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("time", Double.NaN);
-            double t1 = parsed.rows.get(idx.get(idx.size()-1)).baseValues.getOrDefault("time", Double.NaN);
+            //double t0 = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("time", Double.NaN);
+            //double t1 = parsed.rows.get(idx.get(idx.size()-1)).baseValues.getOrDefault("time", Double.NaN);
             double samplePeriod = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("sampleperiod", Double.NaN);
             
             lap.setLapTimeSeconds( idx.size() * samplePeriod );
@@ -114,12 +114,12 @@ public class ImportService {
                     c.setHeader(colName);
                     c.setSample(s);
                     s.getDataChannels().add(c);
-                    dataChannelRepo.save(c);
+            //        dataChannelRepo.save(c);
                 }
                 lap.getSamples().add(s);
-                sampleRepo.save(s);
+            //    sampleRepo.save(s);
             }
-            lapRepo.save(lap);
+            //lapRepo.save(lap);
         }
         log.info("Session contains {} laps", session.getLaps().size());
         session = sessionRepo.save(session);

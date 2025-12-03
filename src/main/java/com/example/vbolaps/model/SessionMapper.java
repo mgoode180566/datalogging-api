@@ -8,7 +8,6 @@ public class SessionMapper {
 	private static final Logger log = LoggerFactory.getLogger(SessionMapper.class.getName());
 	
 	public static SessionDto toDto( Session session ) {
-		log.info(session.toString());
 		return new SessionDto(session.getId(),
 								session.getCircuit(),
 								session.getDriver(),
