@@ -32,8 +32,9 @@ public class ImportService {
     @Transactional
     public Session importVbo(InputStream vboStream, SessionDto sessionDto) throws Exception {
         VboParser parser = new VboParser();
+        log.info("About to parse");
         VboParser.Parsed parsed = parser.parse(vboStream);
-
+        log.info("Parsing complete");
         Session session = new Session();
         session.setCircuit(sessionDto.circuit());
         session.setDriver(sessionDto.driver());
@@ -43,7 +44,7 @@ public class ImportService {
 
         // Flatten rows to maps
         List<Map<String, Double>> rows = parsed.rows.stream().map(r -> r.baseValues).collect(Collectors.toList());
-        
+        log.info("Row count: {}",rows.size());
         ArrayList<Sample> samples = new ArrayList<>();
         for(Map<String, Double> row : rows) {
             Sample sample = new Sample();
@@ -76,6 +77,8 @@ public class ImportService {
             Lap lap = new Lap();
             lap.setSession(session);
             lap.setNumber(lapNo);
+            
+            log.debug("Lap : ", lap.getNumber());
             
             // naive lap time from first/last 'time' column if present
             double t0 = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("time", Double.NaN);

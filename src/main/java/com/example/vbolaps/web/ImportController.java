@@ -26,9 +26,9 @@ public class ImportController {
 
     @PostMapping(value="/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Map<String, Object> importVbo(@RequestPart("file") MultipartFile file, @RequestPart("session") SessionDto sessionDto) throws Exception {
-        log.info("Received file: ");
+        log.info("Received file: {}", file.getName());
         Session session = importService.importVbo(file.getInputStream(), sessionDto);
-        log.info("Session lap count=",session.getLaps().size());
+        log.info("Session lap count={}",session.getLaps().size());
         return Map.of("sessionId", session.getId(), "circuit", session.getCircuit(), "driver", session.getDriver());
     }
 }
