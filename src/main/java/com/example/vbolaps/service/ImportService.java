@@ -122,7 +122,12 @@ public class ImportService {
             //lapRepo.save(lap);
         }
         log.info("Session contains {} laps", session.getLaps().size());
-        session = sessionRepo.save(session);
+        try {
+            session = sessionRepo.save(session);
+        } catch (Exception ex) {
+            log.info("Error when saving {}", ex.getMessage());
+        }
+        log.info("Session saved");
         return session;
     }
 }
