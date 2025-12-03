@@ -45,16 +45,16 @@ public class ImportService {
         // Flatten rows to maps
         List<Map<String, Double>> rows = parsed.rows.stream().map(r -> r.baseValues).collect(Collectors.toList());
         log.info("Row count: {}",rows.size());
-        ArrayList<Sample> samples = new ArrayList<>();
-        for(Map<String, Double> row : rows) {
-            Sample sample = new Sample();
-            sample.setLat(VBoxConverter.convertRawLatitude(row.get("latitude")));
-            sample.setLon(VBoxConverter.convertRawLongitude(row.get("longitude")));
-            sample.setTime(VBoxConverter.convertVboTime(row.get("time")));
-            sample.setVelocityKmh(row.get("velocity kmh"));
-            sample.setSamplePeriod(row.get("sampleperiod"));
-            samples.add(sample);
-        }
+        //ArrayList<Sample> samples = new ArrayList<>();
+//        for(Map<String, Double> row : rows) {
+//            Sample sample = new Sample();
+//            sample.setLat(VBoxConverter.convertRawLatitude(row.get("latitude")));
+//            sample.setLon(VBoxConverter.convertRawLongitude(row.get("longitude")));
+//            sample.setTime(VBoxConverter.convertVboTime(row.get("time")));
+//            sample.setVelocityKmh(row.get("velocity kmh"));
+//            sample.setSamplePeriod(row.get("sampleperiod"));
+//            samples.add(sample);
+//        }
         
         List<Integer> lapAssignments;
         if (parsed.start1.isPresent()) { // detect laps if the start line is valid
