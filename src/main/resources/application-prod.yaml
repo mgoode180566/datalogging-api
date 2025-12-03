@@ -20,8 +20,6 @@ spring:
     idle-timeout: 600000
     max-lifetime: 1800000
 
-
-
   servlet:
     multipart:
       max-file-size: 50MB
