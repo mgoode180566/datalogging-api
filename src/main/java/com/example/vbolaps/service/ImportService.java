@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,11 +20,13 @@ public class ImportService {
     private final SessionRepo sessionRepo;
     private final LapRepo lapRepo;
     private final SampleRepo sampleRepo;
+    private final DataChannelRepo dataChannelRepo;
 
-    public ImportService(SessionRepo sessionRepo, LapRepo lapRepo, SampleRepo sampleRepo) {
+    public ImportService(SessionRepo sessionRepo, LapRepo lapRepo, SampleRepo sampleRepo, DataChannelRepo dataChannelRepo) {
         this.sessionRepo = sessionRepo;
         this.lapRepo = lapRepo;
         this.sampleRepo = sampleRepo;
+        this.dataChannelRepo = dataChannelRepo;
     }
     
     @Transactional
@@ -41,7 +42,7 @@ public class ImportService {
         session.setDate(sessionDto.date());
 
         // Flatten rows to maps
-        List<Map<String, Double>> rows = parsed.rows.stream().map(r -> r.values).collect(Collectors.toList());
+        List<Map<String, Double>> rows = parsed.rows.stream().map(r -> r.baseValues).collect(Collectors.toList());
         
         ArrayList<Sample> samples = new ArrayList<>();
         for(Map<String, Double> row : rows) {
@@ -77,16 +78,16 @@ public class ImportService {
             lap.setNumber(lapNo);
             
             // naive lap time from first/last 'time' column if present
-            double t0 = parsed.rows.get(idx.get(0)).values.getOrDefault("time", Double.NaN);
-            double t1 = parsed.rows.get(idx.get(idx.size()-1)).values.getOrDefault("time", Double.NaN);
-            double samplePeriod = parsed.rows.get(idx.get(0)).values.getOrDefault("sampleperiod", Double.NaN);
+            double t0 = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("time", Double.NaN);
+            double t1 = parsed.rows.get(idx.get(idx.size()-1)).baseValues.getOrDefault("time", Double.NaN);
+            double samplePeriod = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("sampleperiod", Double.NaN);
             
             lap.setLapTimeSeconds( idx.size() * samplePeriod );
 
             session.getLaps().add(lap);
             int seq = 0;
             for (int rowIndex : idx) {
-                Map<String, Double> rv = parsed.rows.get(rowIndex).values;
+                Map<String, Double> rv = parsed.rows.get(rowIndex).baseValues;
                 Sample s = new Sample();
                 s.setLap(lap);
                 s.setSeq(seq++);
@@ -99,9 +100,23 @@ public class ImportService {
                 s.setSamplePeriod(rv.getOrDefault("sampleperiod", Double.NaN));
                 s.setVertVel(rv.getOrDefault("vert-vel", Double.NaN));
                 s.setTsample(rv.getOrDefault("Tsample", Double.NaN));
+                s.setAviFileIndex(rv.getOrDefault("avifileindex", Double.NaN));
+                s.setAviSyncTime(rv.getOrDefault("avisynctime", Double.NaN));
+                
+                for(String colName : parsed.channelColumns) {
+                    Map<String, Double> channelValue = parsed.rows.get(rowIndex).channelValues;
+                    DataChannel c = new DataChannel();
+                    c.setName(colName);
+                    c.setChannelValue(channelValue.getOrDefault(colName, Double.NaN));
+                    c.setHeader(colName);
+                    c.setSample(s);
+                    s.getDataChannels().add(c);
+                    dataChannelRepo.save(c);
+                }
                 lap.getSamples().add(s);
                 sampleRepo.save(s);
             }
+            lapRepo.save(lap);
         }
         session = sessionRepo.save(session);
         return session;

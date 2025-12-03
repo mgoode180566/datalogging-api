@@ -15,14 +15,9 @@ import java.util.Map;
 @RequestMapping("/api")
 public class ImportController {
     private final ImportService importService;
-    private final SessionRepo sessionRepo;
     
-    private final ObjectMapper objectMapper;
-
-    public ImportController(ImportService importService, SessionRepo sessionRepo, ObjectMapper objectMapper) {
+    public ImportController(ImportService importService) {
         this.importService = importService;
-        this.sessionRepo = sessionRepo;
-        this.objectMapper = objectMapper;
     }
 
     @PostMapping(value="/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

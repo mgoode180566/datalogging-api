@@ -41,6 +41,7 @@ public class LapController {
     
     @GetMapping("/sessions/{sessionId}/laps")
     public List<LapDto> listLaps(@PathVariable("sessionId") Long sessionId) {
+        List<Lap> laplist =lapRepo.findBySessionIdOrderByNumber(sessionId);
         return lapRepo.findBySessionIdOrderByNumber(sessionId)
           .stream()
           .map(LapMapper::toDto)

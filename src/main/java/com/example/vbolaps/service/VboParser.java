@@ -9,12 +9,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VboParser {
+    
+    String[] FixedColumns = {"satellites", "time", "latitude", "longitude", "velocity kmh", "heading", "height", "vertical velocity m/s", "sampleperiod", "solution type", "avifileindex", "avisynctime"};
+    
     public static class Record {
-        public Map<String, Double> values = new LinkedHashMap<>();
+        public Map<String, Double> baseValues = new LinkedHashMap<>();
+        public Map<String, Double> channelValues = new LinkedHashMap<>();
     }
     public static class Parsed {
         public Map<String, String> header = new LinkedHashMap<>();
-        public List<String> columns = new ArrayList<>();
+        public List<String> fixedColumns = new ArrayList<>();
+        public List<String> channelColumns = new ArrayList<>();
         public List<Record> rows = new ArrayList<>();
         public Optional<double[]> start1 = Optional.empty(); // lat, lon from [laptiming] if present
         public Optional<double[]> start2 = Optional.empty();
@@ -36,7 +41,10 @@ public class VboParser {
                 // we are in the list of headers
                 while ( (t = br.readLine()) != null) {
                     if (t.isEmpty()) break;
-                    p.columns.add(t.trim());
+                    p.fixedColumns.add(t);
+                    if (!Arrays.asList(FixedColumns).contains(t.trim())) {
+                        p.channelColumns.add(t.trim());
+                    }
                 }
             }
             
@@ -45,12 +53,12 @@ public class VboParser {
                 inData=false;
                 continue; }
             
-            if (inCols) {
-                String[] parts = t.split("\s+");
-                p.columns.addAll(Arrays.asList(parts));
-                inCols=false; inData=true;
-                continue;
-            }
+//            if (inCols) {
+//                String[] parts = t.split("\s+");
+//                p.columns.addAll(Arrays.asList(parts));
+//                inCols=false; inData=true;
+//                continue;
+//            }
             if (t.equalsIgnoreCase("[data]")) { inData=true; continue; }
             if (t.equalsIgnoreCase("[laptiming]")) {
                 // scan next lines for Start ... pattern
@@ -92,11 +100,19 @@ public class VboParser {
                 if (t.isEmpty() || t.startsWith("[")) { inData=false; continue; }
                 String[] parts = t.split("\s+");
                 Record r = new Record();
-                for (int i=0; i<Math.min(parts.length, p.columns.size()); i++) {
-                    try {
-                        r.values.put(p.columns.get(i), Double.parseDouble(parts[i]));
-                    } catch (NumberFormatException e) {
-                        r.values.put(p.columns.get(i), Double.NaN);
+                for (int i=0; i<Math.min(parts.length, p.fixedColumns.size()); i++) {
+                    if (Arrays.asList(FixedColumns).contains(p.fixedColumns.get(i))) {
+                        try {
+                            r.baseValues.put(p.fixedColumns.get(i), Double.parseDouble(parts[i]));
+                        } catch (NumberFormatException e) {
+                            r.baseValues.put(p.fixedColumns.get(i), Double.NaN);
+                        }
+                    } else {
+                        try {
+                            r.channelValues.put(p.fixedColumns.get(i), Double.parseDouble(parts[i]));
+                        } catch (NumberFormatException e) {
+                            r.channelValues.put(p.fixedColumns.get(i), Double.NaN);
+                        }
                     }
                 }
                 p.rows.add(r);

@@ -1,8 +1,12 @@
 package com.example.vbolaps.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Getter @Setter @NoArgsConstructor
 @AllArgsConstructor
@@ -17,12 +21,24 @@ public class Sample {
     
     private int seq;           // sequential index in lap
     private double time;       // vbo 'time' if present
+    private int satellites;
     private double lat;
     private double lon;
     private double velocityKmh;
     private double heading;
     private double height;
-    private Double vertVel;
-    private Double tsample;
+    private double vertVel;
+    private double tsample;
     private double samplePeriod;
+    private double aviFileIndex;
+    private double aviSyncTime;
+    private double solutionType;
+    
+    @OneToMany(
+      mappedBy = "sample",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
+    )
+    @JsonManagedReference
+    private List<DataChannel> dataChannels = new ArrayList<>();
 }
