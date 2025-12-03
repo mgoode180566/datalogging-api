@@ -35,7 +35,7 @@ public class LapController {
     @GetMapping("/sessions/{sessionId}")
     public SessionDto getSession(@PathVariable("sessionId") Long sessionId) {
         Session session = sessionRepo.getReferenceById(sessionId);
-        log.info(session.toString());
+        log.info("Laps : {}", session.getLaps().size());
         return SessionMapper.toDto(session);
     }
     
