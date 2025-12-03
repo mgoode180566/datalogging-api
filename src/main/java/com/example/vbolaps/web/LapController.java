@@ -42,6 +42,7 @@ public class LapController {
     @GetMapping("/sessions/{sessionId}/laps")
     public List<LapDto> listLaps(@PathVariable("sessionId") Long sessionId) {
         Session session = sessionRepo.getReferenceById(sessionId);
+        log.info("Session has {} laps", session.getLaps().size());
         return session.getLaps()
           .stream()
           .map(LapMapper::toDto)
