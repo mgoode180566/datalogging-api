@@ -5,6 +5,6 @@ public class GraphDataMapper {
 		return new GraphDataDto(graphData.getId(),
 			graphData.getName(),
 			graphData.getUnit(),
-			graphData.getJson());
+			graphData.getPoints());
 	}
 }
