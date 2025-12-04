@@ -42,44 +42,47 @@ public class LapController {
     @GetMapping("/sessions/{sessionId}/laps")
     public List<LapDto> listLaps(@PathVariable("sessionId") Long sessionId) {
         Session session = sessionRepo.getReferenceById(sessionId);
-        log.info("Session has {} laps", session.getLaps().size());
-        return session.getLaps()
-          .stream()
-          .map(LapMapper::toDto)
-          .toList();
+        
+        return session.getLaps().stream().map(LapMapper::toDto).toList();
+        
+//        log.info("Session has {} laps", session.getLaps().size());
+//        return session.getLaps()
+//          .stream()
+//          .map(LapMapper::toDto)
+//          .toList();
     }
     
-    @GetMapping("/laps/{lapId}/polyline")
-    public Map<String, Object> lapPolyline(@PathVariable("lapId") Long lapId) {
-        List<Sample> list = sampleRepo.findByLapIdOrderBySeq(lapId);
-        
-        List<List<Double>> coords = list.stream()
-                .map(s -> List.of(s.getLon(), s.getLat(), s.getTime()))
-                .collect(Collectors.toList());
-        
-        double startTime = list.get(0).getTime();
-        double endTime = list.get(list.size() - 1).getTime();
-        double duration = endTime - startTime;
-        
-        
-        return Map.of(
-                "lapId", lapId,
-                "lapTime", duration,
-                "points", coords,
-                "count", coords.size());
-    }
+//    @GetMapping("/laps/{lapId}/polyline")
+//    public Map<String, Object> lapPolyline(@PathVariable("lapId") Long lapId) {
+//        List<Sample> list = sampleRepo.findByLapIdOrderBySeq(lapId);
+//
+//        List<List<Double>> coords = list.stream()
+//                .map(s -> List.of(s.getLon(), s.getLat(), s.getTime()))
+//                .collect(Collectors.toList());
+//
+//        double startTime = list.get(0).getTime();
+//        double endTime = list.get(list.size() - 1).getTime();
+//        double duration = endTime - startTime;
+//
+//
+//        return Map.of(
+//                "lapId", lapId,
+//                "lapTime", duration,
+//                "points", coords,
+//                "count", coords.size());
+//    }
 
-    @GetMapping("/sessions/{sessionId}/overlay")
-    public Map<String, Object> overlay(@PathVariable("sessionId") Long sessionId) {
-        List<Lap> laps = lapRepo.findBySessionIdOrderByNumber(sessionId);
-        List<Map<String, Object>> lines = new ArrayList<>();
-        for (Lap l: laps) {
-            List<Sample> samples = sampleRepo.findByLapIdOrderBySeq(l.getId());
-            List<List<Double>> coords = samples.stream()
-                    .map(s -> List.of(s.getLon(), s.getLat()))
-                    .collect(Collectors.toList());
-            lines.add(Map.of("lap", l.getNumber(), "lapId", l.getId(), "points", coords));
-        }
-        return Map.of("sessionId", sessionId, "laps", lines);
-    }
+//    @GetMapping("/sessions/{sessionId}/overlay")
+//    public Map<String, Object> overlay(@PathVariable("sessionId") Long sessionId) {
+//        List<Lap> laps = lapRepo.findBySessionIdOrderByNumber(sessionId);
+//        List<Map<String, Object>> lines = new ArrayList<>();
+//        for (Lap l: laps) {
+//            List<Sample> samples = sampleRepo.findByLapIdOrderBySeq(l.getId());
+//            List<List<Double>> coords = samples.stream()
+//                    .map(s -> List.of(s.getLon(), s.getLat()))
+//                    .collect(Collectors.toList());
+//            lines.add(Map.of("lap", l.getNumber(), "lapId", l.getId(), "points", coords));
+//        }
+//        return Map.of("sessionId", sessionId, "laps", lines);
+//    }
 }

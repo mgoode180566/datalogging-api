@@ -93,29 +93,47 @@ public class ImportService {
                 Map<String, Double> rv = parsed.rows.get(rowIndex).baseValues;
                 Sample s = new Sample();
                 s.setLap(lap);
-                s.setSeq(seq++);
-                s.setTime(VBoxConverter.convertVboTime(rv.getOrDefault("time", Double.NaN)));
-                s.setLat(VBoxConverter.convertRawLatitude(rv.getOrDefault("latitude", Double.NaN)));
-                s.setLon(VBoxConverter.convertRawLongitude(rv.getOrDefault("longitude", Double.NaN)));
-                s.setVelocityKmh(rv.getOrDefault("velocity kmh", Double.NaN));
-                s.setHeading(rv.getOrDefault("heading", Double.NaN));
-                s.setHeight(rv.getOrDefault("height", Double.NaN));
-                s.setSamplePeriod(rv.getOrDefault("sampleperiod", Double.NaN));
-                s.setVertVel(rv.getOrDefault("vert-vel", Double.NaN));
-                s.setTsample(rv.getOrDefault("Tsample", Double.NaN));
-                s.setAviFileIndex(rv.getOrDefault("avifileindex", Double.NaN));
-                s.setAviSyncTime(rv.getOrDefault("avisynctime", Double.NaN));
+
                 
-                for(String colName : parsed.channelColumns) {
-                    Map<String, Double> channelValue = parsed.rows.get(rowIndex).channelValues;
-                    DataChannel c = new DataChannel();
-                    c.setName(colName);
-                    c.setChannelValue(channelValue.getOrDefault(colName, Double.NaN));
-                    c.setHeader(colName);
-                    c.setSample(s);
-                    s.getDataChannels().add(c);
-            //        dataChannelRepo.save(c);
+                List<String> lstNames = new ArrayList<>(rv.keySet());
+                for(int i = 0; i < lstNames.size(); i++) {
+                    DataChannel dataChannel = new DataChannel();
+                    List<Double> lstValues = new ArrayList<>(rv.values());
+                    dataChannel.setName(lstNames.get(i));
+                    dataChannel.setCValue(lstValues.get(i));
+                    dataChannel.setSample(s);
+                    s.getDataChannels().add(dataChannel);
                 }
+                
+                
+                //s.getValues().addAll(rv.values());
+//                s.setLap(lap);
+//                s.setSeq(seq++);
+//                s.setTime(VBoxConverter.convertVboTime(rv.getOrDefault("time", Double.NaN)));
+//                s.setLat(VBoxConverter.convertRawLatitude(rv.getOrDefault("latitude", Double.NaN)));
+//                s.setLon(VBoxConverter.convertRawLongitude(rv.getOrDefault("longitude", Double.NaN)));
+//                s.setVelocityKmh(rv.getOrDefault("velocity kmh", Double.NaN));
+//                s.setHeading(rv.getOrDefault("heading", Double.NaN));
+//                s.setHeight(rv.getOrDefault("height", Double.NaN));
+//                s.setSamplePeriod(rv.getOrDefault("sampleperiod", Double.NaN));
+//                s.setVertVel(rv.getOrDefault("vert-vel", Double.NaN));
+//                s.setTsample(rv.getOrDefault("Tsample", Double.NaN));
+//                s.setAviFileIndex(rv.getOrDefault("avifileindex", Double.NaN));
+//                s.setAviSyncTime(rv.getOrDefault("avisynctime", Double.NaN));
+//
+
+
+
+//                for(String colName : parsed.channelColumns) {
+//                    Map<String, Double> channelValue = parsed.rows.get(rowIndex).channelValues;
+//                    DataChannel c = new DataChannel();
+//                    c.setName(colName);
+//                    c.setChannelValue(channelValue.getOrDefault(colName, Double.NaN));
+//                    c.setHeader(colName);
+//                    c.setSample(s);
+//                    s.getDataChannels().add(c);
+//            //        dataChannelRepo.save(c);
+//                }
                 lap.getSamples().add(s);
             //    sampleRepo.save(s);
             }

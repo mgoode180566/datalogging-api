@@ -15,13 +15,11 @@ public class DataChannel {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String name; // ADC3_Oil_Pressure
-	private String header; // ADC3 Oil Pressure
-	private String unit; // Psi
-	private Double channelValue;
+  private String name;
+	private Double cValue;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "sample_id")
+	//@JoinColumn(name = "sample_id")
 	@JsonBackReference
 	private Sample sample;
 }

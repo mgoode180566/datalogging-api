@@ -20,5 +20,5 @@ import java.util.List;
 public record SampleDto(
 	Long id,
 	int seq,
-	LinkedHashMap<String, Double> values)
+	List<DataChannel> dataChannels)
 {}
