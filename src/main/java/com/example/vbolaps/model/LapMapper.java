@@ -6,9 +6,7 @@ public class LapMapper {
 			l.getId(),
 			l.getNumber(),
 			l.getLapTimeSeconds(),
-			l.getSamples().stream()
-				.map(SampleMapper::toDto)
-				.toList()
+			l.getGraphs().stream().map(GraphDataMapper::toDto).toList()
 		);
 	}
 }

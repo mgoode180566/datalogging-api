@@ -1,8 +1,6 @@
 package com.example.vbolaps.web;
 
 import com.example.vbolaps.model.*;
-import com.example.vbolaps.repo.LapRepo;
-import com.example.vbolaps.repo.SampleRepo;
 import com.example.vbolaps.repo.SessionRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -14,15 +12,11 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api")
 public class LapController {
-
-    private final LapRepo lapRepo;
-    private final SampleRepo sampleRepo;
+    
     private final SessionRepo sessionRepo;
 
-    public LapController(SessionRepo sessionRepo, LapRepo lapRepo, SampleRepo sampleRepo) {
+    public LapController(SessionRepo sessionRepo) {
         this.sessionRepo = sessionRepo;
-        this.lapRepo = lapRepo;
-        this.sampleRepo = sampleRepo;
     }
     
     @GetMapping("/sessions")

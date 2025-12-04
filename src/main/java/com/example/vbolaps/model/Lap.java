@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity @Getter @Setter @NoArgsConstructor
 @Table(indexes = {@Index(columnList = "session_id, number")})
@@ -20,6 +22,9 @@ public class Lap {
     private int number; // 1-based
     private double lapTimeSeconds;
 
+    //@OneToMany(mappedBy = "lap", cascade = CascadeType.ALL, orphanRemoval = true)
+    //private List<Sample> samples = new ArrayList<>();
+    
     @OneToMany(mappedBy = "lap", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Sample> samples = new ArrayList<>();
+    private List<GraphData> graphs = new ArrayList<>();
 }

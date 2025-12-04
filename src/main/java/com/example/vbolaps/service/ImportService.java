@@ -3,6 +3,7 @@ package com.example.vbolaps.service;
 import com.example.vbolaps.model.*;
 import com.example.vbolaps.repo.*;
 import com.example.vbolaps.utils.VBoxConverter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -18,15 +19,9 @@ public class ImportService {
     private static Logger log = LoggerFactory.getLogger(ImportService.class.getName());
 
     private final SessionRepo sessionRepo;
-    private final LapRepo lapRepo;
-    private final SampleRepo sampleRepo;
-    private final DataChannelRepo dataChannelRepo;
 
-    public ImportService(SessionRepo sessionRepo, LapRepo lapRepo, SampleRepo sampleRepo, DataChannelRepo dataChannelRepo) {
+    public ImportService(SessionRepo sessionRepo) {
         this.sessionRepo = sessionRepo;
-        this.lapRepo = lapRepo;
-        this.sampleRepo = sampleRepo;
-        this.dataChannelRepo = dataChannelRepo;
     }
     
     @Transactional
@@ -45,16 +40,6 @@ public class ImportService {
         // Flatten rows to maps
         List<Map<String, Double>> rows = parsed.rows.stream().map(r -> r.baseValues).collect(Collectors.toList());
         log.info("Row count: {}",rows.size());
-        //ArrayList<Sample> samples = new ArrayList<>();
-//        for(Map<String, Double> row : rows) {
-//            Sample sample = new Sample();
-//            sample.setLat(VBoxConverter.convertRawLatitude(row.get("latitude")));
-//            sample.setLon(VBoxConverter.convertRawLongitude(row.get("longitude")));
-//            sample.setTime(VBoxConverter.convertVboTime(row.get("time")));
-//            sample.setVelocityKmh(row.get("velocity kmh"));
-//            sample.setSamplePeriod(row.get("sampleperiod"));
-//            samples.add(sample);
-//        }
         
         List<Integer> lapAssignments;
         if (parsed.start1.isPresent()) { // detect laps if the start line is valid
@@ -79,65 +64,42 @@ public class ImportService {
             lap.setNumber(lapNo);
             
             log.info("Lap : {}", lap.getNumber());
-            
-            // naive lap time from first/last 'time' column if present
-            //double t0 = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("time", Double.NaN);
-            //double t1 = parsed.rows.get(idx.get(idx.size()-1)).baseValues.getOrDefault("time", Double.NaN);
             double samplePeriod = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("sampleperiod", Double.NaN);
             
             lap.setLapTimeSeconds( idx.size() * samplePeriod );
-
-            session.getLaps().add(lap);
-            int seq = 0;
+            
+            // build map of empty graphs
+            for( int i = 0; i < parsed.headers.size(); i++) {
+                GraphData graphData = new GraphData();
+                graphData.setLap(lap);
+                graphData.setName(parsed.headers.get(i));
+                lap.getGraphs().add(graphData);
+            };
             for (int rowIndex : idx) {
                 Map<String, Double> rv = parsed.rows.get(rowIndex).baseValues;
-                Sample s = new Sample();
-                s.setLap(lap);
-
-                
                 List<String> lstNames = new ArrayList<>(rv.keySet());
-                for(int i = 0; i < lstNames.size(); i++) {
-                    DataChannel dataChannel = new DataChannel();
+                for( int i = 0; i < lstNames.size(); i++) {
+                    GraphData graphData = lap.getGraphs().get(i);
                     List<Double> lstValues = new ArrayList<>(rv.values());
-                    dataChannel.setName(lstNames.get(i));
-                    dataChannel.setCValue(lstValues.get(i));
-                    dataChannel.setSample(s);
-                    s.getDataChannels().add(dataChannel);
-                }
-                
-                
-                //s.getValues().addAll(rv.values());
-//                s.setLap(lap);
-//                s.setSeq(seq++);
-//                s.setTime(VBoxConverter.convertVboTime(rv.getOrDefault("time", Double.NaN)));
-//                s.setLat(VBoxConverter.convertRawLatitude(rv.getOrDefault("latitude", Double.NaN)));
-//                s.setLon(VBoxConverter.convertRawLongitude(rv.getOrDefault("longitude", Double.NaN)));
-//                s.setVelocityKmh(rv.getOrDefault("velocity kmh", Double.NaN));
-//                s.setHeading(rv.getOrDefault("heading", Double.NaN));
-//                s.setHeight(rv.getOrDefault("height", Double.NaN));
-//                s.setSamplePeriod(rv.getOrDefault("sampleperiod", Double.NaN));
-//                s.setVertVel(rv.getOrDefault("vert-vel", Double.NaN));
-//                s.setTsample(rv.getOrDefault("Tsample", Double.NaN));
-//                s.setAviFileIndex(rv.getOrDefault("avifileindex", Double.NaN));
-//                s.setAviSyncTime(rv.getOrDefault("avisynctime", Double.NaN));
-//
-
-
-
-//                for(String colName : parsed.channelColumns) {
-//                    Map<String, Double> channelValue = parsed.rows.get(rowIndex).channelValues;
-//                    DataChannel c = new DataChannel();
-//                    c.setName(colName);
-//                    c.setChannelValue(channelValue.getOrDefault(colName, Double.NaN));
-//                    c.setHeader(colName);
-//                    c.setSample(s);
-//                    s.getDataChannels().add(c);
-//            //        dataChannelRepo.save(c);
-//                }
-                lap.getSamples().add(s);
-            //    sampleRepo.save(s);
+                    
+                    Double v = lstValues.get(i);
+                    if (graphData.getName().equals("latitude")) {
+                        v = VBoxConverter.convertRawLatitude(v);
+                    } else if (graphData.getName().equals("longitude")) {
+                        v = VBoxConverter.convertRawLongitude(v);
+                    };
+                    graphData.getPoints().add(v);
+                };
             }
-            //lapRepo.save(lap);
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            for(int i = 0; i < lap.getGraphs().size(); i++) {
+                GraphData graphData = lap.getGraphs().get(i);
+                List<Double> points = graphData.getPoints();
+                String s = objectMapper.writeValueAsString(points);
+                graphData.setJson(s);
+            }
+            session.getLaps().add(lap);
         }
         log.info("Session contains {} laps", session.getLaps().size());
         try {
