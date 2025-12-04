@@ -29,7 +29,6 @@ public class GraphData {
 	private String name;
 	private String unit;
 	
-	@Lob
 	@Column(columnDefinition = "TEXT", nullable = false)
 	private String json;
 	
