@@ -72,7 +72,7 @@ public class ImportService {
             
             lap.setLapTimeSeconds( idx.size() * samplePeriod );
             
-            session.setChannels(parsed.headers.stream().filter(value -> Arrays.asList(fixedColumns).contains(value)).collect(Collectors.joining(",")));
+            session.setChannels(parsed.headers.stream().filter(value -> !Arrays.asList(fixedColumns).contains(value)).collect(Collectors.joining(",")));
             
             // build map of empty graphs
             for( int i = 0; i < parsed.headers.size(); i++) {
