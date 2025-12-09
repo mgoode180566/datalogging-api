@@ -1,24 +1,27 @@
 spring:
+  config:
+    activate:
+      on-profile: dev
+
   datasource:
-    url: jdbc:h2:mem:vbo;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1
-    driverClassName: org.h2.Driver
-    username: sa
-    password: 'password'
+    url: jdbc:postgresql://localhost:5432/datalogging
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         format_sql: true
-  h2:
-    console:
-      enabled: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+
 app:
   import:
-    # Optional default file path to auto-import on startup
     vboPath: ""

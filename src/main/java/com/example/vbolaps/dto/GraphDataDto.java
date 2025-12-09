@@ -1,4 +1,4 @@
-package com.example.vbolaps.model;
+package com.example.vbolaps.dto;
 
 import java.util.List;
 

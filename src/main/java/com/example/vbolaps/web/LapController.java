@@ -1,5 +1,9 @@
 package com.example.vbolaps.web;
 
+import com.example.vbolaps.dto.SessionDto;
+import com.example.vbolaps.dto.SessionItemDto;
+import com.example.vbolaps.mapper.SessionItemMapper;
+import com.example.vbolaps.mapper.SessionMapper;
 import com.example.vbolaps.model.*;
 import com.example.vbolaps.repo.SessionRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +24,8 @@ public class LapController {
     }
     
     @GetMapping("/sessions")
-    public List<SessionDto> getSessions() {
-        List<Session> sessions = sessionRepo.findAll();
-        List<SessionDto> dtos = sessions.stream().map(s -> SessionMapper.toDto(s)).collect(Collectors.toList());
-        return sessions.stream().map(s -> SessionMapper.toDto(s)).collect(Collectors.toList());
+    public List<SessionItemDto> getSessions() {
+        return sessionRepo.findAll().stream().map(s -> SessionItemMapper.toDto(s)).collect(Collectors.toList());
     }
     
     @GetMapping("/sessions/{sessionId}")
@@ -34,16 +36,21 @@ public class LapController {
     }
     
     @GetMapping("/sessions/{sessionId}/laps")
-    public List<LapDto> listLaps(@PathVariable("sessionId") Long sessionId) {
+    public SessionDto listLaps(@PathVariable("sessionId") Long sessionId) {
         Session session = sessionRepo.getReferenceById(sessionId);
-        
-        return session.getLaps().stream().map(LapMapper::toDto).toList();
+        return SessionMapper.toDto(session);
+        //return session.getLaps().stream().map(LapMapper::toDto).toList();
         
 //        log.info("Session has {} laps", session.getLaps().size());
 //        return session.getLaps()
 //          .stream()
 //          .map(LapMapper::toDto)
 //          .toList();
+    }
+    
+    @DeleteMapping("/sessions/deleteall")
+    public void deleteAllSessions() {
+        sessionRepo.deleteAll();
     }
     
 //    @GetMapping("/laps/{lapId}/polyline")

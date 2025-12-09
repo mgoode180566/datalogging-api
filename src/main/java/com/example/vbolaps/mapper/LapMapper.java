@@ -1,4 +1,7 @@
-package com.example.vbolaps.model;
+package com.example.vbolaps.mapper;
+
+import com.example.vbolaps.dto.LapDto;
+import com.example.vbolaps.model.Lap;
 
 public class LapMapper {
 	public static LapDto toDto(Lap l) {

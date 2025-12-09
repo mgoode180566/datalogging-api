@@ -1,5 +1,6 @@
 package com.example.vbolaps.service;
 
+import com.example.vbolaps.dto.SessionDto;
 import com.example.vbolaps.model.*;
 import com.example.vbolaps.repo.*;
 import com.example.vbolaps.utils.VBoxConverter;
@@ -15,6 +16,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class ImportService {
+    
+    private String[] fixedColumns = {"satellites", "time", "latitude", "longitude", "velocity kmh", "heading", "height", "vertical velocity m/s", "sampleperiod", "solution type", "avifileindex", "avisynctime"};
+    
     
     private static Logger log = LoggerFactory.getLogger(ImportService.class.getName());
 
@@ -67,6 +71,8 @@ public class ImportService {
             double samplePeriod = parsed.rows.get(idx.get(0)).baseValues.getOrDefault("sampleperiod", Double.NaN);
             
             lap.setLapTimeSeconds( idx.size() * samplePeriod );
+            
+            session.setChannels(parsed.headers.stream().filter(value -> !Arrays.asList(fixedColumns).contains(value)).collect(Collectors.joining(",")));
             
             // build map of empty graphs
             for( int i = 0; i < parsed.headers.size(); i++) {

@@ -20,6 +20,7 @@ public class Session {
     private String weather;
     private LocalDate date;
     private Instant createdAt = Instant.now();
+    private String channels;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "session", cascade = CascadeType.ALL, orphanRemoval = true)

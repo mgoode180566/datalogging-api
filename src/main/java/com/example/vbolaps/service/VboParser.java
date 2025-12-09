@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 public class VboParser {
     
-    String[] FixedColumns = {"satellites", "time", "latitude", "longitude", "velocity kmh", "heading", "height", "vertical velocity m/s", "sampleperiod", "solution type", "avifileindex", "avisynctime"};
     
     public static class Record {
         public Map<String, Double> baseValues = new LinkedHashMap<>();
@@ -34,33 +33,19 @@ public class VboParser {
         boolean inCols=false, inData=false;
         Pattern startLine = Pattern.compile("^Start\\s+([+\\-]?[0-9.]+)\\s+([+\\-]?[0-9.]+)\\s+([+\\-]?[0-9.]+)\\s+([+\\-]?[0-9.]+).*$");
         
-        
         while ((line = br.readLine()) != null) {
             String t = line.trim();
-            
             if (t.equalsIgnoreCase("[header]")) {
                 // we are in the list of headers
                 while ( (t = br.readLine()) != null) {
                     if (t.isEmpty()) break;
                     p.headers.add(t.trim());
-//                    p.fixedColumns.add(t);
-//                    if (!Arrays.asList(FixedColumns).contains(t.trim())) {
-//                        p.channelColumns.add(t.trim());
-//                    }
                 }
             }
-            
             if (t.equalsIgnoreCase("[column names]")) {
                 inCols=true;
                 inData=false;
                 continue; }
-            
-//            if (inCols) {
-//                String[] parts = t.split("\s+");
-//                p.columns.addAll(Arrays.asList(parts));
-//                inCols=false; inData=true;
-//                continue;
-//            }
             if (t.equalsIgnoreCase("[data]")) { inData=true; continue; }
             if (t.equalsIgnoreCase("[laptiming]")) {
                 // scan next lines for Start ... pattern
@@ -73,8 +58,6 @@ public class VboParser {
                             double alon = VBoxConverter.convertRawLongitude(Double.parseDouble(m.group(1)));
                             double alat = VBoxConverter.convertRawLatitude(Double.parseDouble(m.group(2)));
                             p.start1 = Optional.of(new double[]{alat, alon});
-                            
-                            
                             double blon = VBoxConverter.convertRawLongitude(Double.parseDouble(m.group(3)));
                             double blat = VBoxConverter.convertRawLatitude(Double.parseDouble(m.group(4)));
                             p.start2 = Optional.of(new double[]{blat, blon});
@@ -108,20 +91,6 @@ public class VboParser {
                     } catch (NumberFormatException ex) {
                         r.baseValues.put(p.headers.get(i), Double.NaN);
                     }
-//                    if (Arrays.asList(FixedColumns).contains(p.fixedColumns.get(i))) {
-//                        try {
-//                            r.baseValues.put(p.fixedColumns.get(i), Double.parseDouble(parts[i]));
-//                        } catch (NumberFormatException e) {
-//                            r.baseValues.put(p.fixedColumns.get(i), Double.NaN);
-//                        }
-//                    } else {
-//                        try {
-//                            r.channelValues.put(p.fixedColumns.get(i), Double.parseDouble(parts[i]));
-//                        } catch (NumberFormatException e) {
-//                            r.channelValues.put(p.fixedColumns.get(i), Double.NaN);
-//                        }
-//                    }
-//                    }
                 }
                 p.rows.add(r);
             }
