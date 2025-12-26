@@ -4,7 +4,7 @@ spring:
       on-profile: dev
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/datalogging
+    url: jdbc:postgresql://localhost:5433/datalogging
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -12,6 +12,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
     properties:
       hibernate:
         format_sql: true
